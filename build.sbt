@@ -1,4 +1,4 @@
-name := """play-scala-forms-example"""
+name := """late-entries-example"""
 
 version := "2.6.x"
 

@@ -1,0 +1,74 @@
+@(entries: Seq[LateEntry], form: Form[LateEntryForm.Data], postUrl: Call)(implicit request: MessagesRequestHeader)
+
+@main("Late Entry") {
+
+    <h1>Late Entry</h1>
+    @* Flash shows updates to a page *@
+    @request.flash.data.map { case (name, value) =>
+    <div>@name: @value</div>
+    }
+
+    <table>
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Gender</th>
+                <th>Race</th>
+                <th>Cell</th>
+                <th>Email</th>
+                <th>Vitality</th>
+                <th>ID Nr.</th>
+                <th>Timing Tag</th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(e <- entries) {
+            <tr>
+                <td>@e.fname</td>
+                <td>@e.lname</td>
+                <td>@e.gender</td>
+                <td>@e.race</td>
+                <td>@e.cell</td>
+                <td>@e.email</td>
+                <td>@e.vitality</td>
+                <td>@e.idnum</td>
+                <td>@e.timingTag</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <hr/>
+    @* Global errors are not tied to any particular form field *@
+    @if(form.hasGlobalErrors) {
+        @form.globalErrors.map { error: FormError =>
+            <div>
+                @error.key: @error.message
+            </div>
+        }
+    }
+
+    @helper.form(postUrl) {
+        @helper.CSRF.formField
+
+        @helper.inputText(form("fname"))
+        @helper.inputText(form("lname"))
+        @helper.inputRadioGroup(form("gender"), options = Seq("Male" -> "Male", "Female" -> "Female"),
+            '_label -> "Gender",
+            '_error -> form("gender").error.map(_.withMessage("select gender")))
+        @helper.inputRadioGroup(form("race"), options = Seq("10km" -> "10km", "5km" -> "5km"),
+            '_label -> "Race",
+            '_error -> form("race").error.map(_.withMessage("select race")))
+
+        @helper.inputText(form("cell"))
+        @helper.inputText(form("email"))
+        @helper.inputRadioGroup(form("vitality"), options = Seq("Yes" -> "Yes", "No" -> "No"),
+            '_label -> "Vitality Member?",
+            '_error -> form("vitality").error.map(_.withMessage("select vitality")))
+        @helper.inputText(form("idnum"))
+        @helper.inputText(form("timingTag"))
+        <button>Enter</button>
+    }
+
+}

@@ -17,13 +17,13 @@ class BrowserSpec extends PlaySpec with GuiceOneServerPerSuite with OneBrowserPe
 
   "The browser should" must {
     "successfully process a form" in {
-      val listWidgetsURL = controllers.routes.WidgetController.listWidgets().absoluteURL(false, s"localhost:$port")
+      val listWidgetsURL = controllers.routes.EntryController.listEntries().absoluteURL(false, s"localhost:$port")
 
       go to listWidgetsURL
 
       // Enter in the form fields...
-      textField("name").value = "Foo"
-      textField("price").value = "100"
+      textField("fname").value = "Paul"
+      textField("lname").value = "Scott"
 
       // Press enter button...
       submit()
@@ -31,7 +31,7 @@ class BrowserSpec extends PlaySpec with GuiceOneServerPerSuite with OneBrowserPe
       // Wait for server to process...
       eventually {
         // Check to see that the value made into Flash message!
-        pageSource contains "Foo"
+        pageSource contains "Scott"
       }
     }
   }

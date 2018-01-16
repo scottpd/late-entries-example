@@ -1,6 +1,6 @@
 package unit
 
-import controllers.WidgetForm
+import controllers.LateEntryForm
 import org.scalatestplus.play.PlaySpec
 import play.api.data.FormError
 import play.api.i18n._
@@ -18,42 +18,42 @@ class UnitSpec extends PlaySpec {
 
     "apply successfully from request" in {
       // The easiest way to test a form is by passing it a fake request.
-      val call = controllers.routes.WidgetController.createWidget()
-      implicit val request: Request[_] = FakeRequest(call).withFormUrlEncodedBody("name" -> "foo", "price" -> "100")
+      val call = controllers.routes.EntryController.createEntry()
+      implicit val request: Request[_] = FakeRequest(call).withFormUrlEncodedBody("fname" -> "Paul", "lname" -> "Scott")
       // A successful binding using an implicit request will give you a form with a value.
-      val boundForm = WidgetForm.form.bindFromRequest()
+      val boundForm = LateEntryForm.form.bindFromRequest()
       // You can then get the widget data out and test it.
-      val widgetData = boundForm.value.get
+      val entryData = boundForm.value.get
 
-      widgetData.name must equal("foo")
-      widgetData.price must equal(100)
+      entryData.fname must equal("Paul")
+      entryData.lname must equal("Scott")
     }
 
     "apply successfully from map" in {
       // You can also bind directy from a map, if you don't have a request handy.
-      val data = Map("name" -> "foo", "price" -> "100")
+      val data = Map("fname" -> "Paul", "lname" -> "Scott")
       // A successful binding will give you a form with a value.
-      val boundForm = WidgetForm.form.bind(data)
+      val boundForm = LateEntryForm.form.bind(data)
       // You can then get the widget data out and test it.
-      val widgetData = boundForm.value.get
+      val entryData = boundForm.value.get
 
-      widgetData.name must equal("foo")
-      widgetData.price must equal(100)
+      entryData.name must equal("Paul")
+      entryData.price must equal("Scott")
     }
 
     "show errors when applied unsuccessfully" in {
       // Pass in a negative price that fails the constraints...
-      val data = Map("name" -> "foo", "price" -> "-100")
+      val data = Map("fname" -> "Paul", "email" -> "Scott")
 
       // ...and binding the form will show errors.
-      val errorForm = WidgetForm.form.bind(data)
+      val errorForm = LateEntryForm.form.bind(data)
       // You can then get the widget data out and test it.
       val listOfErrors = errorForm.errors
 
       // Note that the FormError's key is the field it was bound to.
       // If there is no key, then it is a "global error".
       val formError: FormError = listOfErrors.head
-      formError.key must equal("price")
+      formError.key must equal("email")
 
       // In this case, we don't have any global errors -- they're caused
       // when a constraint on the form itself fails.
@@ -77,12 +77,12 @@ class UnitSpec extends PlaySpec {
       // app.inject[MessagesApi] and messageApi.preferred(request), but we can
       // do it by hand here just to demonstrate what happens underneath the hood:
       val lang: Lang = Lang.defaultLang
-      val messagesApi: MessagesApi = new DefaultMessagesApi(Map(lang.code -> Map("error.min" -> "Must be greater or equal to {0}")))
+      val messagesApi: MessagesApi = new DefaultMessagesApi(Map(lang.code -> Map("error.min" -> "Must be a valid email")))
       val messagesProvider: MessagesProvider = messagesApi.preferred(Seq(lang))
       val message: String = Messages(formError.message, formError.args: _*)(messagesProvider)
 
       // And the message will be run through with the arguments:
-      message must equal("Must be greater or equal to 0")
+      message must equal("Must be a valid email")
     }
 
   }
